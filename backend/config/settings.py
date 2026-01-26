@@ -9,27 +9,32 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
+import environ
 from datetime import timedelta
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-ANGULAR_DIR = BASE_DIR.parent / "frontend/dist/frontend/browser"
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    "django-insecure-g&lp-p4!xc53=r_$1kup%#-bmpo4h+1$gw9@!2jp5a3y%t@sg9"
+env = environ.Env(
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"])
 )
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-ALLOWED_HOSTS = []
+# Читаем .env файл, если он есть (полезно для локальной разработки без Docker)
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+ANGULAR_DIR = BASE_DIR.parent / "frontend/dist/frontend/browser"
+
+# --- СЕКЦИЯ БЕЗОПАСНОСТИ ---
+SECRET_KEY = env('SECRET_KEY', default='your-fallback-secret-key')
+DEBUG = env('DEBUG')
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+
+# --- БАЗА ДАННЫХ ---
+# Эта строка автоматически распарсит DATABASE_URL из docker-compose
+DATABASES = {
+    'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3')
+}
 
 # Authentication
 AUTH_USER_MODEL = "users.User"
@@ -85,24 +90,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-CORS_ALLOW_ALL_ORIGINS = True
+# --- КОРСЫ (Важно для Angular) ---
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=["http://localhost:4200"])
 CORS_URLS_REGEX = r"^/api/.*$"
 
+# --- СТАТИКА И МЕДИА ---
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles" # Сюда соберется всё для прода
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
+# Если Angular билд лежит в корне проекта
+STATICFILES_DIRS = [ANGULAR_DIR] if ANGULAR_DIR.exists() else []
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation."
@@ -134,12 +134,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
-STATIC_URL = "static/"
-STATICFILES_DIRS = [ANGULAR_DIR]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
