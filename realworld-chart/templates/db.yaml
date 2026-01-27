@@ -24,6 +24,14 @@ spec:
           value: {{ .Values.postgres.password | quote }}
         ports:
         - containerPort: 5432
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: db-data 
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+
 ---
 apiVersion: v1
 kind: Service

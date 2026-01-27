@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-migrate
+  annotations:
+    # Эта магия Helm запустит Job ДО обновления основного приложения
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    spec:
+      containers:
+      - name: migrate
+        image: {{ .Values.image.backend }}
+        command: ["python", "manage.py", "migrate", "--noinput"]
+        env:
+          - name: DATABASE_URL
+            value: {{ .Values.databaseUrl }}
+      restartPolicy: OnFailure

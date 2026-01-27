@@ -1,0 +1,13 @@
+# templates/db-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  annotations:
+    "helm.sh/resource-policy": keep # <--- МАГИЯ ЗДЕСЬ
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
