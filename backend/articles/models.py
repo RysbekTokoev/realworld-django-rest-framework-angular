@@ -20,7 +20,7 @@ class Tag(models.Model):
     objects = TagManager()
 
     name = models.CharField(max_length=120, unique=True)
-    slug = models.SlugField(max_length=120, blank=True)
+    slug = models.SlugField(max_length=120, blank=True, allow_unicode=True)
 
     def __str__(self):
         return self.name
@@ -28,12 +28,12 @@ class Tag(models.Model):
 
 @receiver(pre_save, sender=Tag)
 def tag_pre_save(sender, instance, **kwargs):
-    instance.slug = slugify(instance.name)
+    instance.slug = slugify(instance.name, allow_unicode=True)
 
 
 class Article(models.Model):
     title = models.CharField(max_length=120, unique=True)
-    slug = models.SlugField(max_length=120, blank=True)
+    slug = models.SlugField(max_length=120, blank=True, allow_unicode=True)
     description = models.CharField(max_length=255)
     body = models.TextField()
     tag_list = models.ManyToManyField(Tag, related_name="articles", blank=True)
@@ -52,7 +52,7 @@ class Article(models.Model):
 
 @receiver(pre_save, sender=Article)
 def article_pre_save(sender, instance, **kwargs):
-    instance.slug = slugify(instance.title)
+    instance.slug = slugify(instance.title, allow_unicode=True)
 
 
 class Comment(models.Model):

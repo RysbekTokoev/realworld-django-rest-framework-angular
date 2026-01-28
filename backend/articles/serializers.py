@@ -52,10 +52,10 @@ class ArticleSerializer(serializers.ModelSerializer):
         if "title" not in attrs:
             return attrs
 
-        slug = slugify(attrs["title"])
+        slug = slugify(attrs["title"], allow_unicode=True)
         if not slug:
             raise serializers.ValidationError(
-                {"title": "Title must contain at least one alphanumeric character."}
+                {"title": "Title must contain at least one valid character."}
             )
         queryset = (
             Article.objects.exclude(pk=self.instance.pk)
