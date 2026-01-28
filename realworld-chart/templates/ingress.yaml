@@ -7,8 +7,6 @@ metadata:
     kubernetes.io/ingress.class: nginx
     # Передаем реальные IP клиентов бэкенду
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_set_header X-Forwarded-Proto $scheme;
 spec:
   ingressClassName: nginx
   rules:
