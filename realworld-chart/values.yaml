@@ -9,9 +9,9 @@ backend:
   allowedHosts: "35.195.122.18,localhost"
   env:
     - name: CSRF_TRUSTED_ORIGINS
-      value: "http://34.195.122.18"
+      value: "http://35.195.122.18"
     - name: CORS_ALLOWED_ORIGINS
-      value: "http://34.195.122.18"
+      value: "http://35.195.122.18"
 
 # ... твои образы ...
 postgres:
