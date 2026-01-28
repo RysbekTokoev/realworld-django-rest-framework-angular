@@ -115,17 +115,33 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
   deploy:
+    name: Setup, Build, Publish, and Deploy
     runs-on: ubuntu-latest
-    needs: docker_push
+
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Set Kubernetes Context
-        uses: azure/k8s-set-context@v3
-        with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+    # 1. Авторизация в Google Cloud
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-      - name: Deploy to K8s
-        run: |
-          helm upgrade --install realworld ./realworld-chart
+    # 2. Настройка kubectl для твоего кластера
+    - name: 'Set up GKE credentials'
+      uses: 'google-github-actions/get-gke-credentials@v2'
+      with:
+        cluster_name: 'secrets.CLUSTER_1'
+        location: 'secrets.CLUSTER_1_ZONE' # например, us-central1-c
+
+    # 4. Helm Upgrade
+    - name: Deploy with Helm
+      run: |
+        # Устанавливаем зависимости чарта, если они есть
+        helm dependency update ./realworld-chart
+
+        # Запускаем обновление
+        helm upgrade --install realworld ./realworld-chart \
+          --set postgres.password=${{ secrets.DB_PASSWORD }} \
+          --wait --timeout 10m

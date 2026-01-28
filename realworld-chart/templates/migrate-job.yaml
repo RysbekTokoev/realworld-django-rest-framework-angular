@@ -15,5 +15,5 @@ spec:
         command: ["python", "manage.py", "migrate", "--noinput"]
         env:
           - name: DATABASE_URL
-            value: {{ .Values.databaseUrl }}
+            value: "postgres://{{ .Values.postgres.user }}:{{ .Values.postgres.password }}@{{ .Values.postgres.host }}:{{ .Values.postgres.port }}/{{ .Values.postgres.db }}"
       restartPolicy: OnFailure

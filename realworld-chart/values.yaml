@@ -5,10 +5,13 @@ image:
   backend: rybsek/real-back:latest
   frontend: rybsek/real-front:latest
 
-domain: my-realworld-app.com
+backend:
+  allowedHosts: "35.195.122.18,localhost"
 
+# ... твои образы ...
 postgres:
   user: postgres
-  db: real_db
-  # В продакшене лучше использовать K8s Secrets для пароля!
   password: postgres
+  db: real_db
+  host: db-service # Имя сервиса внутри K8s
+  port: 5432

@@ -21,7 +21,7 @@ spec:
         - name: DATABASE_URL
           value: "postgres://{{ .Values.postgres.user }}:{{ .Values.postgres.password }}@db-service:5432/{{ .Values.postgres.db }}"
         - name: ALLOWED_HOSTS
-          value: "my-realworld-app.com,localhost,127.0.0.1"
+          value: {{ .Values.backend.allowedHosts | quote }}
 ---
 apiVersion: v1
 kind: Service

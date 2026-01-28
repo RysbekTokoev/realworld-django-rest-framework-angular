@@ -93,6 +93,18 @@ WSGI_APPLICATION = "config.wsgi.application"
 # --- КОРСЫ (Важно для Angular) ---
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=["http://localhost:4200"])
 CORS_URLS_REGEX = r"^/api/.*$"
+# Если ты заходишь по IP (обязательно с указанием протокола)
+CSRF_TRUSTED_ORIGINS = ['http://' + x for x in env('ALLOWED_HOSTS')]
+
+# Для отладки в K8s можно также добавить (если проксирует на 8000 внутри)
+CSRF_TRUSTED_ORIGINS += ['http://localhost:8000', 'http://backend-service:8000']
+
+# Указываем Django доверять заголовку X-Forwarded-Proto, который ставит Nginx
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Если ты работаешь без HTTPS (только по IP), убедись, что эти настройки в False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 # --- СТАТИКА И МЕДИА ---
 STATIC_URL = "static/"

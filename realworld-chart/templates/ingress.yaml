@@ -3,14 +3,20 @@ kind: Ingress
 metadata:
   name: main-ingress
   annotations:
+    # Явно говорим контроллеру, что этот Ingress принадлежит ему
     kubernetes.io/ingress.class: nginx
+    # Передаем реальные IP клиентов бэкенду
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header X-Forwarded-Proto $scheme;
 spec:
+  ingressClassName: nginx
   rules:
-  - host: {{ .Values.domain | quote }}
-    http:
+  # Мы НЕ указываем host, чтобы он принимал ЛЮБЫЕ запросы по IP
+  - http:
       paths:
       - path: /api
-        pathType: Prefix
+        pathType: ImplementationSpecific # Попробуй этот тип для API
         backend:
           service:
             name: backend-service
