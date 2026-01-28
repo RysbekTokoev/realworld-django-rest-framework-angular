@@ -7,6 +7,7 @@ image:
 
 backend:
   allowedHosts: "35.195.122.18,localhost"
+  externalIp: "35.195.122.18"
   env:
     - name: CSRF_TRUSTED_ORIGINS
       value: "http://35.195.122.18"

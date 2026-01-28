@@ -27,6 +27,8 @@
 .DS_Store
 Thumbs.db
 backend/db.sqlite3
+**/__pycache__/
+**/staticfiles/
 
 #log files
 npm-debug.log*

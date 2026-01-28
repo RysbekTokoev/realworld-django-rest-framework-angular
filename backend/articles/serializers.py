@@ -48,12 +48,21 @@ class ArticleSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
+        # Only validate title if it's being updated
+        if "title" not in attrs:
+            return attrs
+
+        slug = slugify(attrs["title"])
+        if not slug:
+            raise serializers.ValidationError(
+                {"title": "Title must contain at least one alphanumeric character."}
+            )
         queryset = (
             Article.objects.exclude(pk=self.instance.pk)
             if self.instance
             else Article.objects.all()
         )
-        if queryset.filter(slug=slugify(attrs["title"])).exists():
+        if queryset.filter(slug=slug).exists():
             raise serializers.ValidationError(
                 {"slug": "article with this slug already exists."}
             )

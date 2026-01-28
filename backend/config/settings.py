@@ -28,7 +28,7 @@ ANGULAR_DIR = BASE_DIR.parent / "frontend/dist/frontend/browser"
 # --- СЕКЦИЯ БЕЗОПАСНОСТИ ---
 SECRET_KEY = env('SECRET_KEY', default='your-fallback-secret-key')
 DEBUG = env('DEBUG')
-ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
 # --- БАЗА ДАННЫХ ---
 # Эта строка автоматически распарсит DATABASE_URL из docker-compose
