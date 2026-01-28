@@ -94,8 +94,14 @@ WSGI_APPLICATION = "config.wsgi.application"
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=["http://localhost:4200"])
 CORS_URLS_REGEX = r"^/api/.*$"
 # Если ты заходишь по IP (обязательно с указанием протокола)
-CSRF_TRUSTED_ORIGINS = ['http://' + x for x in env('ALLOWED_HOSTS')]
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 
+# Если список пуст (например, при первом запуске), добавим туда все из ALLOWED_HOSTS
+if not CSRF_TRUSTED_ORIGINS:
+    for host in ALLOWED_HOSTS:
+        if host != '*':
+            CSRF_TRUSTED_ORIGINS.append(f'http://{host}')
+            CSRF_TRUSTED_ORIGINS.append(f'https://{host}')
 # Для отладки в K8s можно также добавить (если проксирует на 8000 внутри)
 CSRF_TRUSTED_ORIGINS += ['http://localhost:8000', 'http://backend-service:8000']
 
@@ -105,6 +111,14 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Если ты работаешь без HTTPS (только по IP), убедись, что эти настройки в False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
+
+# Доверять заголовку хоста, который передает Nginx
+USE_X_FORWARDED_HOST = True
+# Доверять заголовку порта
+USE_X_FORWARDED_PORT = True
+
+# Если ты не используешь HTTPS (пока что), это критично:
+CSRF_COOKIE_HTTPONLY = False  # Чтобы Angular мог прочитать куку, если нужно
 
 # --- СТАТИКА И МЕДИА ---
 STATIC_URL = "static/"
